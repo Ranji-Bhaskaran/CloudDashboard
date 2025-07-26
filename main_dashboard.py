@@ -72,9 +72,10 @@ with tabs[1]:
         st.warning("Reward curve not found. Run the scheduler module first.")
 
     st.markdown("#### Benchmark Results")
-    if os.path.exists("data/scheduling_metrics.json"):
-        with open("data/scheduling_metrics.json") as f:
+    if os.path.exists("data/scheduler_metrics.json"):
+        with open("data/scheduler_metrics.json") as f:
             sched = json.load(f)
+            st.code(json.dumps(sched, indent=2)) 
         for key, value in sched.items():
             st.text(f"{key}: {value}")
 
