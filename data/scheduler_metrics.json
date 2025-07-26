@@ -1,0 +1,10 @@
+{
+    "Tasks Scheduled": 20000,
+    "DQN Cumulative Reward": -376506.0,
+    "DQN Avg Reward": -18.825300216674805,
+    "DQN Avg Wait Time": 52185.63469449996,
+    "FCFS Avg Reward": -3.979498583458334,
+    "FCFS Avg Wait Time": 22015.14200000001,
+    "RR Avg Reward": -3.979498583458334,
+    "RR Avg Wait Time": 22015.14200000001
+}
