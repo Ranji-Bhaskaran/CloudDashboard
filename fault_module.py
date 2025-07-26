@@ -11,9 +11,17 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 import os
 import json
+import gdown
+
+# STEP 1.5: Download vmCloud_data.csv from Google Drive if not present
+os.makedirs("data", exist_ok=True)
+vmcloud_path = "data/vmCloud_data.csv"
+if not os.path.exists(vmcloud_path):
+    print("⬇️ Downloading vmCloud_data.csv from Google Drive...")
+    gdown.download("https://drive.google.com/uc?id=1_V3uAShSGwjYzxdFm9QURrF-UqxQh9on", vmcloud_path, quiet=False)
 
 # STEP 2: Load Dataset
-df = pd.read_csv('data/vmCloud_data.csv')
+df = pd.read_csv(vmcloud_path)
 
 # STEP 3: Drop Irrelevant Columns
 drop_cols = ['timestamp', 'task_type', 'task_status', 'task_prior']
@@ -60,7 +68,6 @@ df['anomaly'] = df['prediction'].map({1: 0, -1: 1})
 
 # STEP 9: Save Results
 os.makedirs("images", exist_ok=True)
-os.makedirs("data", exist_ok=True)
 
 anomaly_count = int(df['anomaly'].sum())
 df[df['anomaly'] == 1].to_csv("data/fault_anomalies.csv", index=False)
