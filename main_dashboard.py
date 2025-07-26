@@ -3,9 +3,23 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import json
 import os
+import subprocess
 
+# Auto-run modules if needed
+def run_once_if_missing(path, script):
+    if not os.path.exists(path):
+        print(f"📦 Running {script} to generate missing file: {path}")
+        try:
+            subprocess.run(["python", script], check=True)
+        except Exception as e:
+            print(f"❌ Error running {script}: {e}")
+
+run_once_if_missing("data/predicted_cost_50k.csv", "cost_module.py")
+run_once_if_missing("images/dqn_reward_curve.png", "scheduler_module.py")
+run_once_if_missing("data/fault_anomalies.csv", "fault_module.py")
+
+# Streamlit page setup
 st.set_page_config(page_title="Dashboard", layout="wide")
-
 st.title("Dashboard")
 st.caption("Real-time monitoring and analytics for cost prediction, resource scheduling, and fault detection")
 
@@ -15,7 +29,6 @@ tabs = st.tabs(["📊 Cost Prediction", "🧠 Resource Scheduling", "💥 Fault 
 # --- TAB 1: Cost Prediction --- #
 with tabs[0]:
     st.subheader("📊 Cost Prediction Module")
-
     cost_file = "data/predicted_cost_50k.csv"
     metrics_file = "data/cost_metrics.json"
 
@@ -48,7 +61,6 @@ with tabs[0]:
 
     if os.path.exists("images/shap_summary.png"):
         st.image("images/shap_summary.png", caption="SHAP Summary Plot")
-
 
 # --- TAB 2: Resource Scheduling --- #
 with tabs[1]:
@@ -93,7 +105,6 @@ with tabs[1]:
     else:
         st.info("Run the scheduling module to generate benchmark metrics.")
 
-
 # --- TAB 3: Fault Detection --- #
 with tabs[2]:
     st.subheader("💥 Fault Detection Module")
@@ -101,13 +112,12 @@ with tabs[2]:
     if os.path.exists("data/fault_anomalies.csv"):
         df_fault = pd.read_csv("data/fault_anomalies.csv")
         st.dataframe(df_fault.head(10))
-        st.success(f"✅ Showing anomalies from data/fault_anomalies.csv")
+        st.success("✅ Showing anomalies from data/fault_anomalies.csv")
     else:
         st.warning("No fault anomalies CSV found. Run the fault detection module.")
 
     if os.path.exists("images/fault_detection_plot.png"):
         st.image("images/fault_detection_plot.png", caption="CPU Usage vs Execution Time with Anomalies")
-
 
 # --- Footer --- #
 st.markdown("""
