@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyd
+*.dll
+*.lib
+data/vmCloud_data.csv
