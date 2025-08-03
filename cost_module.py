@@ -10,6 +10,7 @@ from sklearn.ensemble import RandomForestRegressor, VotingRegressor
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import matplotlib.pyplot as plt
+import seaborn as sns
 import shap
 import os
 import json
@@ -51,7 +52,6 @@ def objective(trial):
 
 study = optuna.create_study(direction="minimize")
 study.optimize(objective, n_trials=30)
-
 best_params = study.best_trial.params
 print("✅ Best Parameters from Optuna:", best_params)
 
@@ -63,9 +63,7 @@ lr = LinearRegression().fit(X_train, y_train)
 rf = RandomForestRegressor(n_estimators=100, random_state=42).fit(X_train, y_train)
 
 # STEP 6: Voting Ensemble
-ensemble = VotingRegressor(estimators=[
-    ('lr', lr), ('rf', rf), ('xgb', xgb)
-])
+ensemble = VotingRegressor(estimators=[('lr', lr), ('rf', rf), ('xgb', xgb)])
 ensemble.fit(X_train, y_train)
 
 # STEP 7: Evaluation + save metrics
@@ -125,11 +123,33 @@ plt.tight_layout()
 plt.savefig("images/shap_summary.png")
 plt.close()
 
-# STEP 10: Predict and Save to CSV
+# STEP 10: Benchmark Metrics Bar Chart
+model_names = ["Linear", "Random Forest", "XGBoost", "Voting"]
+maes = [lr_metrics["MAE"], rf_metrics["MAE"], xgb_metrics["MAE"], ens_metrics["MAE"]]
+rmses = [lr_metrics["RMSE"], rf_metrics["RMSE"], xgb_metrics["RMSE"], ens_metrics["RMSE"]]
+r2s = [lr_metrics["R2"], rf_metrics["R2"], xgb_metrics["R2"], ens_metrics["R2"]]
+
+fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+ax[0].bar(model_names, maes, color='skyblue')
+ax[0].set_title("MAE Comparison")
+ax[1].bar(model_names, rmses, color='orange')
+ax[1].set_title("RMSE Comparison")
+ax[2].bar(model_names, r2s, color='green')
+ax[2].set_title("R² Score Comparison")
+
+for a in ax:
+    a.grid(True)
+    a.set_ylabel("Score")
+
+plt.tight_layout()
+plt.savefig("images/model_metric_comparison.png")
+plt.close()
+
+# STEP 11: Predict and Save to CSV
 df_predict['Predicted_Cost'] = ensemble.predict(df_predict[features])
 df_predict.to_csv("data/predicted_cost_50k.csv", index=False)
 print("✅ Predictions saved to data/predicted_cost_50k.csv")
 
-# STEP 11: Runtime Logging
+# STEP 12: Runtime Logging
 end_time = time.time()
 print(f"⏱️ Runtime: {end_time - start_time:.2f} seconds")
